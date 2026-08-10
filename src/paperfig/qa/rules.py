@@ -21,6 +21,19 @@ def audit_spec(spec: FigureSpec, artifact_dir: str | Path | None = None) -> list
             )
         )
 
+    if spec.chart.mark == "scatter" and spec.chart.size:
+        issues.append(
+            AuditIssue(
+                rule_id="AREA_ENCODING_DISCLOSURE",
+                severity="info",
+                message=(
+                    "Scatter marker area is normalized for display; "
+                    "disclose the size encoding."
+                ),
+                evidence=f"chart.size={spec.chart.size}",
+            )
+        )
+
     if not spec.data.license:
         issues.append(
             AuditIssue(
@@ -101,15 +114,30 @@ def audit_spec(spec: FigureSpec, artifact_dir: str | Path | None = None) -> list
     return issues
 
 
-def write_audit(spec: FigureSpec, output: str | Path, artifact_dir: str | Path | None = None) -> None:
+def write_audit(
+    spec: FigureSpec,
+    output: str | Path,
+    artifact_dir: str | Path | None = None,
+    data_validation_passed: bool | None = None,
+) -> None:
     issues = audit_spec(spec, artifact_dir=artifact_dir)
     payload = {
         "schema_version": 1,
         "status": "failed" if any(issue.severity == "error" for issue in issues) else "passed",
+        "checks": {
+            "figure_spec": "passed",
+            "data_validation": (
+                "passed" if data_validation_passed else "not_run"
+                if data_validation_passed is None
+                else "failed"
+            ),
+            "artifact_presence": "passed" if artifact_dir is not None else "not_run",
+        },
         "issues": [issue.to_dict() for issue in issues],
         "limitations": [
             "Rule-based MVP audit; not peer review.",
-            "Color-vision and semantic model checks are not yet implemented.",
+            "Color-vision simulation and semantic model checks are not yet implemented.",
+            "Passing checks does not validate the scientific claim or statistical method.",
         ],
     }
     Path(output).write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
