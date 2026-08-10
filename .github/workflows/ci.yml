@@ -23,10 +23,16 @@ jobs:
         run: ruff check .
       - name: Test
         run: pytest
-      - name: Smoke render
-        run: paperfig render examples/specs/grouped_bar.yaml --output runs/ci
+      - name: Smoke render all supported marks
+        shell: bash
+        run: |
+          set -euo pipefail
+          for spec in examples/specs/*.yaml; do
+            name="$(basename "${spec}" .yaml)"
+            paperfig render "${spec}" --output "runs/ci/${name}"
+          done
       - name: Upload smoke artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: smoke-render
+          name: smoke-renders
           path: runs/ci

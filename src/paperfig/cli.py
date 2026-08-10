@@ -65,7 +65,10 @@ def _init_project(destination: Path) -> None:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="paperfig", description="Render and audit scientific figures")
+    parser = argparse.ArgumentParser(
+        prog="paperfig",
+        description="Render and audit scientific figures",
+    )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     init_parser = subparsers.add_parser("init", help="create a starter project")
