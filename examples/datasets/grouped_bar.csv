@@ -1,0 +1,7 @@
+model,dataset,accuracy,std
+Baseline,A,0.71,0.020
+Improved,A,0.79,0.018
+Ours,A,0.86,0.012
+Baseline,B,0.68,0.024
+Improved,B,0.76,0.019
+Ours,B,0.83,0.014

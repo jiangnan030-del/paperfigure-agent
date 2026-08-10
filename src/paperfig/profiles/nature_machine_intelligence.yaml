@@ -1,0 +1,24 @@
+name: nature-machine-intelligence-2026-starter
+status: interpreted-working-profile
+verified_on: 2026-08-10
+source_status: "Derived from official Nature Machine Intelligence guidance; verify live instructions at submission."
+widths_in:
+  single_column: 3.50
+  double_column: 7.0866
+font_family: DejaVu Sans
+base_font_size: 7.0
+line_width: 0.8
+palette: ["#0072B2", "#E69F00", "#009E73", "#CC79A7", "#56B4E9"]
+highlight_color: "#D55E00"
+constraints:
+  max_width_mm: 180
+  minimum_panel_dpi: 300
+  label_font_size_pt: [5, 7]
+  editable_labels_required: true
+  scale_bars_not_magnification: true
+  legend_requires_error_definition: true
+  source_data_encouraged: true
+sources:
+  - title: "Nature Machine Intelligence — AIP and formatting"
+    url: https://www.nature.com/natmachintell/submission-guidelines/aip-and-formatting
+    accessed: 2026-08-10

@@ -1,0 +1,11 @@
+PaperFigure Agent — clean-room implementation notice
+
+As of 2026-08-10, this repository contains no copied source code, images,
+datasets, or prose from ChenLiu-1996/figures4papers. That repository is listed
+as conceptual prior art because no explicit license was identified during the
+initial audit. References and acknowledgements are recorded in
+`docs/REFERENCES.md` and `THIRD_PARTY.yml`.
+
+The MIT License applies only to original material in this repository. It does
+not grant rights to third-party works, publication figures, venue branding,
+datasets, fonts, or model outputs.

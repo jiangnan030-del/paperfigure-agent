@@ -1,0 +1,28 @@
+name: eccv-2026-starter
+status: interpreted-working-profile
+verified_on: 2026-08-10
+source_status: "Derived from official ECCV 2026 submission policies and author kit; the current LNCS template remains authoritative."
+widths_in:
+  single_column: 4.80
+  double_column: 4.80
+font_family: DejaVu Sans
+base_font_size: 10.0
+line_width: 0.8
+palette: ["#0072B2", "#E69F00", "#009E73", "#CC79A7", "#56B4E9"]
+highlight_color: "#D55E00"
+constraints:
+  template_family: Springer LNCS
+  current_2026_template_required: true
+  line_art_minimum_dpi: 800
+  line_art_preferred_dpi: 1200
+  halftone_minimum_dpi: 300
+  lettering_height_mm: 2
+  figure_caption_position: below
+  absolute_coordinates_forbidden: true
+sources:
+  - title: "ECCV 2026 Submission Policies"
+    url: https://eccv.ecva.net/Conferences/2026/SubmissionPolicies
+    accessed: 2026-08-10
+  - title: "Official ECCV 2026 Author Kit"
+    url: https://github.com/paolo-favaro/paper-template
+    accessed: 2026-08-10

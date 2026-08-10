@@ -1,0 +1,25 @@
+name: neurips-2026-starter
+status: interpreted-working-profile
+verified_on: 2026-08-10
+source_status: "Derived from the official NeurIPS 2026 call and linked style template; the current style files remain authoritative."
+widths_in:
+  single_column: 5.50
+  double_column: 5.50
+font_family: DejaVu Sans
+base_font_size: 9.0
+line_width: 0.8
+palette: ["#0072B2", "#E69F00", "#009E73", "#CC79A7", "#56B4E9"]
+highlight_color: "#D55E00"
+constraints:
+  artwork_must_be_legible: true
+  dark_lines_for_reproduction: true
+  figure_caption_position: below
+  grayscale_legibility_required: true
+  current_template_required: true
+sources:
+  - title: "NeurIPS 2026 Call for Papers"
+    url: https://neurips.cc/Conferences/2026/CallForPapers
+    accessed: 2026-08-10
+  - title: "NeurIPS 2026 Style Files"
+    url: https://neurips.cc/Conferences/2026/PaperInformation/StyleFiles
+    accessed: 2026-08-10

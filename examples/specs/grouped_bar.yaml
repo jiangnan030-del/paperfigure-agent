@@ -1,0 +1,42 @@
+claim: "The proposed method improves accuracy across both synthetic datasets."
+venue: nature-machine-intelligence
+stage: draft
+backend: matplotlib
+seed: 7
+
+data:
+  source: ../datasets/grouped_bar.csv
+  license: CC0-1.0
+  citation: "Synthetic demonstration data created for PaperFigure Agent; not research evidence."
+
+chart:
+  family: comparison
+  mark: bar
+  x: model
+  y: accuracy
+  series: dataset
+  error: std
+  highlight: Ours
+  y_label: Accuracy
+
+layout:
+  width: single_column
+  panels: 1
+  aspect_ratio: 0.72
+
+qa:
+  require_zero_baseline: true
+  color_vision_gate: true
+  require_alt_text: true
+
+export:
+  formats: [svg, pdf, png]
+  dpi: 300
+
+references:
+  - id: figures4papers
+    title: figures4papers
+    url: https://github.com/ChenLiu-1996/figures4papers
+    use: conceptual_reference_only
+    license_status: unknown
+    copied_files: []

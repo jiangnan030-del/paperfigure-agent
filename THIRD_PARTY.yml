@@ -1,0 +1,85 @@
+registry_version: 1
+last_reviewed: 2026-08-10
+entries:
+  - id: figures4papers
+    title: figures4papers
+    creators: ["Chen Liu / ChenLiu-1996"]
+    url: https://github.com/ChenLiu-1996/figures4papers
+    type: software-and-figure-case-repository
+    license_status: unknown
+    permitted_use_in_this_repo: conceptual_reference_only
+    copied_files: []
+    copied_code: false
+    copied_text: false
+    copied_pixels: false
+    verification_note: "No explicit root LICENSE identified during initial audit; re-check before any reuse."
+
+  - id: vega-lite
+    title: Vega-Lite
+    url: https://vega.github.io/vega-lite/
+    type: visualization-grammar
+    permitted_use_in_this_repo: conceptual_reference
+    copied_files: []
+
+  - id: draco2
+    title: Draco 2
+    url: https://github.com/cmudig/draco2
+    type: visualization-constraint-system
+    permitted_use_in_this_repo: conceptual_reference
+    copied_files: []
+
+  - id: paperbanana
+    title: PaperBanana
+    url: https://github.com/dwzhu-pku/PaperBanana
+    type: research-software
+    permitted_use_in_this_repo: conceptual_reference
+    copied_files: []
+
+  - id: paper2figure
+    title: Paper2Figure
+    url: https://openaccess.thecvf.com/content/CVPR2026/html/Han_Paper2Figure_A_Multi-Agent_Collaborative_System_for_Figure_Generation_Towards_Academic_CVPR_2026_paper.html
+    type: research-paper
+    permitted_use_in_this_repo: conceptual_reference
+    copied_files: []
+
+  - id: crafter
+    title: Crafter
+    url: https://github.com/HaozheZhao/Crafter
+    type: research-software
+    permitted_use_in_this_repo: conceptual_reference
+    copied_files: []
+
+  - id: nature-machine-intelligence-guidance
+    title: "Nature Machine Intelligence — AIP and formatting"
+    url: https://www.nature.com/natmachintell/submission-guidelines/aip-and-formatting
+    type: official-author-guidance
+    accessed: 2026-08-10
+    permitted_use_in_this_repo: requirements_reference
+    copied_files: []
+
+  - id: icml-2026-guidance
+    title: ICML 2026 Author Instructions and Example Paper
+    url: https://icml.cc/Conferences/2026/AuthorInstructions
+    secondary_url: https://media.icml.cc/Conferences/ICML2026/Styles/example_paper.pdf
+    type: official-author-guidance
+    accessed: 2026-08-10
+    permitted_use_in_this_repo: requirements_reference
+    copied_files: []
+
+  - id: neurips-2026-guidance
+    title: NeurIPS 2026 Call for Papers and Style Files
+    url: https://neurips.cc/Conferences/2026/CallForPapers
+    secondary_url: https://neurips.cc/Conferences/2026/PaperInformation/StyleFiles
+    type: official-author-guidance
+    accessed: 2026-08-10
+    permitted_use_in_this_repo: requirements_reference
+    copied_files: []
+
+  - id: eccv-2026-guidance
+    title: ECCV 2026 Submission Policies and Author Kit
+    url: https://eccv.ecva.net/Conferences/2026/SubmissionPolicies
+    secondary_url: https://github.com/paolo-favaro/paper-template
+    type: official-author-guidance
+    accessed: 2026-08-10
+    permitted_use_in_this_repo: requirements_reference
+    copied_files: []

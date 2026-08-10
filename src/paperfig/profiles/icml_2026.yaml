@@ -1,0 +1,28 @@
+name: icml-2026-starter
+status: interpreted-working-profile
+verified_on: 2026-08-10
+source_status: "Derived from official ICML 2026 author instructions and example paper; the LaTeX template remains authoritative."
+widths_in:
+  single_column: 3.25
+  double_column: 6.75
+font_family: DejaVu Sans
+base_font_size: 8.0
+line_width: 0.8
+palette: ["#0072B2", "#E69F00", "#009E73", "#CC79A7", "#56B4E9"]
+highlight_color: "#D55E00"
+constraints:
+  minimum_line_width_pt: 0.5
+  prefer_vector_for_plots: true
+  preferred_vector_formats: [eps, pdf]
+  title_inside_figure_forbidden: true
+  axis_names_required: true
+  component_labels_required: true
+  figure_caption_position: below
+  color_blind_accessibility_review: true
+sources:
+  - title: "ICML 2026 Author Instructions"
+    url: https://icml.cc/Conferences/2026/AuthorInstructions
+    accessed: 2026-08-10
+  - title: "ICML 2026 Example Paper and Formatting Instructions"
+    url: https://media.icml.cc/Conferences/ICML2026/Styles/example_paper.pdf
+    accessed: 2026-08-10

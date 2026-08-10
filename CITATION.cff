@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use PaperFigure Agent, cite the archived release and disclose any AI-assisted figure workflow required by your venue."
+title: "PaperFigure Agent"
+type: software
+authors:
+  - family-names: "Jiangnan"
+    alias: "jiangnan030-del"
+repository-code: "https://github.com/jiangnan030-del/paperfigure-agent"
+url: "https://github.com/jiangnan030-del/paperfigure-agent"
+license: MIT
+version: 0.1.0
+date-released: 2026-08-10
+keywords:
+  - scientific visualization
+  - reproducibility
+  - provenance
+  - figure audit
