@@ -1,0 +1,28 @@
+claim: "The proposed method has a higher synthetic score distribution."
+venue: icml 2026
+stage: draft
+backend: matplotlib
+seed: 19
+
+data:
+  source: ../datasets/distribution.csv
+  license: CC0-1.0
+  citation: "Synthetic demonstration data created for PaperFigure Agent; not research evidence."
+
+chart:
+  family: distribution
+  mark: box
+  x: method
+  y: score
+  highlight: Ours
+  x_label: Method
+  y_label: Score
+
+qa:
+  require_zero_baseline: false
+  color_vision_gate: true
+  require_alt_text: true
+
+export:
+  formats: [svg, pdf, png]
+  dpi: 300

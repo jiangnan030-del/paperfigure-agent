@@ -1,0 +1,29 @@
+claim: "The proposed method has the largest synthetic effect estimate."
+venue: eccv 2026
+stage: draft
+backend: matplotlib
+seed: 29
+
+data:
+  source: ../datasets/interval.csv
+  license: CC0-1.0
+  citation: "Synthetic demonstration data created for PaperFigure Agent; not research evidence."
+
+chart:
+  family: uncertainty
+  mark: interval
+  x: method
+  y: effect
+  lower: lower
+  upper: upper
+  highlight: Ours
+  y_label: Effect estimate
+
+qa:
+  require_zero_baseline: false
+  color_vision_gate: true
+  require_alt_text: true
+
+export:
+  formats: [svg, pdf, png]
+  dpi: 300

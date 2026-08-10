@@ -1,0 +1,30 @@
+claim: "The synthetic methods illustrate an accuracy-latency trade-off."
+venue: neurips 2026
+stage: draft
+backend: matplotlib
+seed: 13
+
+data:
+  source: ../datasets/scatter.csv
+  license: CC0-1.0
+  citation: "Synthetic demonstration data created for PaperFigure Agent; not research evidence."
+
+chart:
+  family: relationship
+  mark: scatter
+  x: latency
+  y: accuracy
+  series: family
+  size: parameters
+  highlight: Proposed
+  x_label: Latency (ms)
+  y_label: Accuracy
+
+qa:
+  require_zero_baseline: false
+  color_vision_gate: true
+  require_alt_text: true
+
+export:
+  formats: [svg, pdf, png]
+  dpi: 300
