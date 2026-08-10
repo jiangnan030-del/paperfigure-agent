@@ -1,0 +1,28 @@
+claim: "The proposed method leads on each synthetic dataset."
+venue: nature-machine-intelligence
+stage: draft
+backend: matplotlib
+seed: 17
+
+data:
+  source: ../datasets/heatmap.csv
+  license: CC0-1.0
+  citation: "Synthetic demonstration data created for PaperFigure Agent; not research evidence."
+
+chart:
+  family: matrix
+  mark: heatmap
+  x: model
+  y: dataset
+  value: score
+  x_label: Model
+  y_label: Dataset
+
+qa:
+  require_zero_baseline: false
+  color_vision_gate: true
+  require_alt_text: true
+
+export:
+  formats: [svg, pdf, png]
+  dpi: 300

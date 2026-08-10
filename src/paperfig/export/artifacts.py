@@ -6,7 +6,12 @@ from pathlib import Path
 from matplotlib.figure import Figure
 
 
-def export_figure(figure: Figure, output_dir: str | Path, formats: tuple[str, ...], dpi: int) -> list[Path]:
+def export_figure(
+    figure: Figure,
+    output_dir: str | Path,
+    formats: tuple[str, ...],
+    dpi: int,
+) -> list[Path]:
     destination = Path(output_dir)
     destination.mkdir(parents=True, exist_ok=True)
     outputs: list[Path] = []

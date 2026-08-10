@@ -1,0 +1,16 @@
+method,score
+Baseline,0.66
+Baseline,0.69
+Baseline,0.70
+Baseline,0.72
+Baseline,0.74
+Improved,0.73
+Improved,0.75
+Improved,0.77
+Improved,0.79
+Improved,0.80
+Ours,0.80
+Ours,0.82
+Ours,0.84
+Ours,0.86
+Ours,0.88

@@ -1,12 +1,17 @@
 # SPDX-License-Identifier: MIT
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any
 from urllib.parse import urlparse
 
 import yaml
+
+SUPPORTED_MARKS = frozenset(
+    {"bar", "line", "scatter", "heatmap", "box", "violin", "interval"}
+)
 
 
 class SpecError(ValueError):
@@ -26,6 +31,15 @@ def _required_text(mapping: Mapping[str, Any], key: str, scope: str) -> str:
     return value.strip()
 
 
+def _optional_text(mapping: Mapping[str, Any], key: str, scope: str) -> str | None:
+    value = mapping.get(key)
+    if value is None:
+        return None
+    if not isinstance(value, str) or not value.strip():
+        raise SpecError(f"{scope}.{key} must be a non-empty string when provided")
+    return value.strip()
+
+
 @dataclass(frozen=True)
 class DataSpec:
     source: str
@@ -42,7 +56,26 @@ class ChartSpec:
     series: str | None = None
     error: str | None = None
     highlight: str | None = None
+    value: str | None = None
+    lower: str | None = None
+    upper: str | None = None
+    size: str | None = None
+    x_label: str | None = None
     y_label: str | None = None
+
+    def required_columns(self) -> tuple[str, ...]:
+        columns = {self.x, self.y}
+        for optional in (
+            self.series,
+            self.error,
+            self.value,
+            self.lower,
+            self.upper,
+            self.size,
+        ):
+            if optional:
+                columns.add(optional)
+        return tuple(sorted(columns))
 
 
 @dataclass(frozen=True)
@@ -80,7 +113,7 @@ class FigureSpec:
     seed: int = 0
 
     @classmethod
-    def from_mapping(cls, raw: Mapping[str, Any]) -> "FigureSpec":
+    def from_mapping(cls, raw: Mapping[str, Any]) -> FigureSpec:
         claim = _required_text(raw, "claim", "spec")
         venue = _required_text(raw, "venue", "spec").lower()
         stage = _required_text(raw, "stage", "spec").lower()
@@ -95,23 +128,41 @@ class FigureSpec:
             raise SpecError("MVP data.source must be a local relative path, not a URL")
         data = DataSpec(
             source=source,
-            license=data_raw.get("license"),
-            citation=data_raw.get("citation"),
+            license=_optional_text(data_raw, "license", "data"),
+            citation=_optional_text(data_raw, "citation", "data"),
         )
 
         chart_raw = _as_mapping(raw.get("chart"), "chart")
+        mark = _required_text(chart_raw, "mark", "chart").lower()
+        if mark not in SUPPORTED_MARKS:
+            raise SpecError(
+                f"unsupported chart.mark='{mark}'; choose from {', '.join(sorted(SUPPORTED_MARKS))}"
+            )
         chart = ChartSpec(
             family=_required_text(chart_raw, "family", "chart").lower(),
-            mark=_required_text(chart_raw, "mark", "chart").lower(),
+            mark=mark,
             x=_required_text(chart_raw, "x", "chart"),
             y=_required_text(chart_raw, "y", "chart"),
-            series=chart_raw.get("series"),
-            error=chart_raw.get("error"),
-            highlight=chart_raw.get("highlight"),
-            y_label=chart_raw.get("y_label"),
+            series=_optional_text(chart_raw, "series", "chart"),
+            error=_optional_text(chart_raw, "error", "chart"),
+            highlight=_optional_text(chart_raw, "highlight", "chart"),
+            value=_optional_text(chart_raw, "value", "chart"),
+            lower=_optional_text(chart_raw, "lower", "chart"),
+            upper=_optional_text(chart_raw, "upper", "chart"),
+            size=_optional_text(chart_raw, "size", "chart"),
+            x_label=_optional_text(chart_raw, "x_label", "chart"),
+            y_label=_optional_text(chart_raw, "y_label", "chart"),
         )
-        if chart.mark != "bar":
-            raise SpecError("MVP currently implements chart.mark='bar' only")
+        if mark == "heatmap" and not chart.value:
+            raise SpecError("chart.value is required for heatmap marks")
+        if mark == "interval" and (not chart.lower or not chart.upper):
+            raise SpecError("chart.lower and chart.upper are required for interval marks")
+        if mark in {"box", "violin"} and chart.series:
+            raise SpecError("box and violin marks do not yet support chart.series")
+        if chart.error and mark not in {"bar", "line"}:
+            raise SpecError("chart.error is supported only for bar and line marks")
+        if chart.size and mark != "scatter":
+            raise SpecError("chart.size is supported only for scatter marks")
 
         layout_raw = _as_mapping(raw.get("layout", {}), "layout")
         layout = LayoutSpec(

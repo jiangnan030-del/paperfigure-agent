@@ -28,20 +28,35 @@ See:
 - [`docs/ACADEMIC_INTEGRITY.md`](docs/ACADEMIC_INTEGRITY.md)
 - [`docs/REFERENCES.md`](docs/REFERENCES.md)
 - [`docs/VENUE_PROFILES.md`](docs/VENUE_PROFILES.md)
+- [`docs/SCIENTIFIC_SEMANTICS.md`](docs/SCIENTIFIC_SEMANTICS.md)
 - [`THIRD_PARTY.yml`](THIRD_PARTY.yml)
 
-## Implemented in this first scaffold
+## Implemented core
 
 - typed `FigureSpec` loader and validation;
 - local CSV data loading (remote inputs are rejected);
-- deterministic grouped-bar rendering with Matplotlib;
+- deterministic Matplotlib renderers for bar, line, scatter, heatmap, box, violin, and interval charts;
 - source-cited 2026 starter profiles for Nature Machine Intelligence, ICML, NeurIPS, and ECCV;
 - SVG, PDF, and PNG export;
 - rule-based audit with severity and evidence;
+- data-fidelity validation for duplicate coordinates, non-finite values, negative errors, and invalid intervals;
 - SHA-256 input provenance and replay artifacts;
 - CLI commands: `init`, `validate`, `render`, and `audit`;
 - tests and GitHub Actions CI;
 - contribution gates for citation, provenance, licensing, and clean-room review.
+
+## Supported marks
+
+| Mark | Primary use | Required extra fields |
+| --- | --- | --- |
+| `bar` | grouped comparisons | optional `series`, `error` |
+| `line` | trends and trajectories | optional `series`, `error` |
+| `scatter` | relationships and trade-offs | optional `series`, `size` |
+| `heatmap` | matrix comparison | `value` |
+| `box` / `violin` | raw-observation distributions | none |
+| `interval` | forest and uncertainty plots | `lower`, `upper` |
+
+All bundled datasets are synthetic and explicitly labeled as non-evidence.
 
 ## Quick start
 

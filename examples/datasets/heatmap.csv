@@ -1,0 +1,10 @@
+model,dataset,score
+Baseline,A,0.71
+Improved,A,0.79
+Ours,A,0.86
+Baseline,B,0.68
+Improved,B,0.76
+Ours,B,0.83
+Baseline,C,0.74
+Improved,C,0.81
+Ours,C,0.88

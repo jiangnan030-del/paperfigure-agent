@@ -1,0 +1,7 @@
+latency,accuracy,family,parameters
+12.0,0.72,Compact,1.2
+18.0,0.78,Compact,2.0
+31.0,0.82,Standard,4.5
+45.0,0.85,Standard,7.0
+52.0,0.88,Proposed,8.5
+68.0,0.89,Large,12.0

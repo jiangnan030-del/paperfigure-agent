@@ -1,0 +1,4 @@
+method,effect,lower,upper
+Baseline,0.08,0.02,0.14
+Improved,0.15,0.09,0.21
+Ours,0.24,0.18,0.30

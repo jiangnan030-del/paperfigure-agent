@@ -1,0 +1,30 @@
+claim: "The proposed method improves steadily across training epochs on synthetic data."
+venue: icml 2026
+stage: draft
+backend: matplotlib
+seed: 11
+
+data:
+  source: ../datasets/trend.csv
+  license: CC0-1.0
+  citation: "Synthetic demonstration data created for PaperFigure Agent; not research evidence."
+
+chart:
+  family: trend
+  mark: line
+  x: epoch
+  y: score
+  series: method
+  error: std
+  highlight: Ours
+  x_label: Epoch
+  y_label: Score
+
+qa:
+  require_zero_baseline: false
+  color_vision_gate: true
+  require_alt_text: true
+
+export:
+  formats: [svg, pdf, png]
+  dpi: 300
