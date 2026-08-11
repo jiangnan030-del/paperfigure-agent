@@ -2,6 +2,25 @@
 
 ## Unreleased
 
+### Phase 2 — complete deterministic workflow
+
+#### Added
+
+- continuous-colormap perceptual review for heatmaps under normal and simulated dichromat vision;
+- `paperfig compare <baseline> <candidate>` for data, spec, environment, SVG, and Reviewer Mode deltas;
+- JSON and Markdown comparison reports;
+- `paperfig package <bundle> --approve` with an explicit human gate;
+- deterministic submission ZIPs, package-level artifact manifests, and companion SHA-256 files;
+- end-to-end tests for colormap thresholds, A/B comparison, tamper rejection, and reproducible packages;
+- `docs/PHASE2_COMPLETE.md` describing the complete verification and delivery contract.
+
+#### Changed
+
+- CI now smoke-tests render, audit, replay, review, compare, package, and regression for every supported mark;
+- the first CI run publishes real Ubuntu-generated visual baselines for adoption in the same pull request;
+- Reviewer Mode no longer emits the `SEQUENTIAL_COLORMAP_NOT_REVIEWED` placeholder for heatmaps;
+- Reviewer Mode limitations now distinguish implemented colormap checks from remaining human judgments.
+
 ### Phase 2 — visual regression
 
 #### Added
@@ -9,33 +28,20 @@
 - `paperfig regress <spec>`, which compares a rendering against a recorded baseline;
 - structural SVG fingerprints covering text, colours, font sizes, element counts, canvas size, and quantised path geometry;
 - reviewable JSON baselines in `tests/baselines/`, so a rendering change appears as a readable diff;
-- environment-aware severity: layout-sensitive findings downgrade to notes when the baseline was recorded under a different Matplotlib version;
-- `--update` to record a baseline and `--fail-on {error,warning,never}` to control the exit code;
-- `docs/VISUAL_REGRESSION.md` documenting the method, every rule, and the limitations.
-
-#### Changed
-
-- CI records fingerprints for every example, uploads them, and enforces any committed baseline;
-- audit limitations now name which checks live in `review` and `regress` instead of claiming colour-vision checks are unimplemented.
+- environment-aware severity for layout-sensitive findings;
+- `--update` and `--fail-on {error,warning,never}`;
+- `docs/VISUAL_REGRESSION.md`.
 
 ### Phase 2 — reviewer mode
 
 #### Added
 
-- `paperfig review <bundle>`, a deterministic reviewer pass over a rendered run bundle;
-- run-bundle integrity verification against the recorded SHA-256 artifact manifest;
-- dichromat separation checks for deuteranopia, protanopia, and tritanopia in CIE L\*a\*b\*;
-- WCAG non-text contrast, near-neutral colour, and greyscale luminance checks;
-- venue typography and figure-width checks measured from the exported SVG;
-- redundant-encoding warnings for multi-series line and scatter marks;
-- `figure.review.json` and `figure.review.md` reviewer reports;
-- `--fail-on {error,warning,never}` to control the review exit code;
-- `docs/REVIEWER_MODE.md` documenting every rule, threshold, and limitation.
-
-#### Changed
-
-- CI now reviews every example after rendering, auditing, and replaying it;
-- `paperfig audit` and `paperfig review` are documented as separate stages.
+- `paperfig review <bundle>`, a deterministic reviewer pass over a run bundle;
+- run-bundle integrity verification against the SHA-256 artifact manifest;
+- dichromat separation checks for deuteranopia, protanopia, and tritanopia;
+- WCAG contrast, near-neutral colour, greyscale luminance, typography, and size checks;
+- `figure.review.json` and `figure.review.md` reports;
+- `docs/REVIEWER_MODE.md`.
 
 ## Unreleased — Phase 1 executable core
 
@@ -51,9 +57,9 @@
 
 ### Fixed
 
-- generated `figure.py` now contains real newlines and is compile-tested;
+- generated `figure.py` contains real newlines and is compile-tested;
 - replay scripts no longer depend on the original dataset path;
-- render commands now fail after preserving artifacts when an audit reports an error;
-- CI now audits and replays every supported example after rendering;
+- render commands preserve artifacts before failing an audit gate;
+- CI audits and replays every supported example;
 - zero-baseline enforcement is limited to bar charts;
 - venue-profile sources remain embedded in provenance.

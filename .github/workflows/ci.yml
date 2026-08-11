@@ -7,6 +7,8 @@ on:
 
 permissions:
   contents: read
+  issues: write
+  pull-requests: write
 
 jobs:
   test:
@@ -23,7 +25,7 @@ jobs:
         run: ruff check .
       - name: Test
         run: pytest
-      - name: Smoke render, audit, replay, and review all supported marks
+      - name: Smoke complete deterministic workflow
         shell: bash
         run: |
           set -euo pipefail
@@ -37,6 +39,10 @@ jobs:
               python figure.py
             )
             paperfig review "${output}"
+            paperfig compare "${output}" "${output}" \
+              --output "runs/ci/comparisons/${name}" --fail-on warning
+            paperfig package "${output}" \
+              --output "runs/ci/packages/${name}.submission.zip" --approve
           done
       - name: Record and enforce visual regression baselines
         shell: bash
@@ -46,9 +52,29 @@ jobs:
             name="$(basename "${spec}" .yaml)"
             paperfig regress "${spec}" --update --baselines runs/ci/baselines
             if [ -f "tests/baselines/${name}.baseline.json" ]; then
-              paperfig regress "${spec}" --baselines tests/baselines --fail-on warning
+              paperfig regress "${spec}" \
+                --baselines tests/baselines --fail-on warning
             fi
           done
+      - name: Publish first baseline payload to this pull request
+        if: >-
+          github.event_name == 'pull_request' &&
+          hashFiles('tests/baselines/*.baseline.json') == ''
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tar -czf /tmp/paperfig-baselines.tar.gz -C runs/ci baselines
+          {
+            echo '<!-- paperfig-baseline-bootstrap -->'
+            echo 'CI_BASELINES_TAR_GZ_BASE64'
+            echo '```text'
+            base64 -w 76 /tmp/paperfig-baselines.tar.gz
+            echo '```'
+          } > /tmp/paperfig-baselines-comment.md
+          gh pr comment "${{ github.event.pull_request.number }}" \
+            --body-file /tmp/paperfig-baselines-comment.md
       - name: Upload smoke artifacts
         uses: actions/upload-artifact@v4
         with:
