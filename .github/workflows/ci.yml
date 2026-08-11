@@ -38,6 +38,17 @@ jobs:
             )
             paperfig review "${output}"
           done
+      - name: Record and enforce visual regression baselines
+        shell: bash
+        run: |
+          set -euo pipefail
+          for spec in examples/specs/*.yaml; do
+            name="$(basename "${spec}" .yaml)"
+            paperfig regress "${spec}" --update --baselines runs/ci/baselines
+            if [ -f "tests/baselines/${name}.baseline.json" ]; then
+              paperfig regress "${spec}" --baselines tests/baselines --fail-on warning
+            fi
+          done
       - name: Upload smoke artifacts
         uses: actions/upload-artifact@v4
         with:

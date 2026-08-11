@@ -139,8 +139,10 @@ def write_audit(
         },
         "issues": [issue.to_dict() for issue in issues],
         "limitations": [
-            "Rule-based MVP audit; not peer review.",
-            "Color-vision simulation and semantic model checks are not yet implemented.",
+            "Rule-based MVP audit of the FigureSpec; not peer review.",
+            "Color-vision and contrast checks run in paperfig review, not here.",
+            "Visual regression against a recorded baseline runs in paperfig regress.",
+            "Semantic model checks of the claim are not implemented.",
             "Passing checks does not validate the scientific claim or statistical method.",
         ],
     }

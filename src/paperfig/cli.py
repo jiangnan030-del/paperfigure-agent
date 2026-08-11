@@ -8,6 +8,12 @@ from pathlib import Path
 
 from paperfig.harness import render_spec
 from paperfig.qa import AuditError, audit_spec
+from paperfig.regression import (
+    DEFAULT_BASELINE_DIR,
+    RegressionError,
+    record_baseline,
+    regress_spec,
+)
 from paperfig.review import ReviewError, exceeds_threshold, review_bundle, write_review
 from paperfig.spec import SpecError, load_spec
 
@@ -94,6 +100,28 @@ def build_parser() -> argparse.ArgumentParser:
         default="error",
         help="severity that makes the command exit non-zero (default: error)",
     )
+
+    regress_parser = subparsers.add_parser(
+        "regress", help="compare a rendering against its recorded baseline"
+    )
+    regress_parser.add_argument("spec", type=Path)
+    regress_parser.add_argument(
+        "--baselines",
+        type=Path,
+        default=DEFAULT_BASELINE_DIR,
+        help=f"directory holding recorded baselines (default: {DEFAULT_BASELINE_DIR})",
+    )
+    regress_parser.add_argument(
+        "--update",
+        action="store_true",
+        help="record the current rendering as the new baseline",
+    )
+    regress_parser.add_argument(
+        "--fail-on",
+        choices=("error", "warning", "never"),
+        default="error",
+        help="severity that makes the command exit non-zero (default: error)",
+    )
     return parser
 
 
@@ -122,9 +150,18 @@ def main(argv: list[str] | None = None) -> None:
         if args.command == "review":
             findings = review_bundle(args.bundle)
             write_review(args.bundle, findings)
-            payload = [finding.to_dict() for finding in findings]
-            print(json.dumps(payload, ensure_ascii=False, indent=2))
+            print(json.dumps([item.to_dict() for item in findings], ensure_ascii=False, indent=2))
             if exceeds_threshold(findings, args.fail_on):
                 raise SystemExit(2)
-    except (AuditError, ReviewError, SpecError, FileExistsError) as exc:
+            return
+        if args.command == "regress":
+            if args.update:
+                print(str(record_baseline(args.spec, args.baselines)))
+                return
+            _, findings = regress_spec(args.spec, args.baselines)
+            print(json.dumps([item.to_dict() for item in findings], ensure_ascii=False, indent=2))
+            if exceeds_threshold(findings, args.fail_on):
+                raise SystemExit(2)
+            return
+    except (AuditError, RegressionError, ReviewError, SpecError, FileExistsError) as exc:
         raise SystemExit(str(exc)) from exc
