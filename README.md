@@ -15,6 +15,7 @@ claim + data + venue profile
         -> rule-based audit
         -> SVG/PDF/PNG + provenance
         -> deterministic reviewer pass
+        -> structural baseline comparison
 ```
 
 The long-term architecture follows `Prompt -> Context -> Harness -> Loop -> Graph -> Evolver`, but the MVP intentionally starts with the auditable core.
@@ -31,6 +32,7 @@ See:
 - [`docs/VENUE_PROFILES.md`](docs/VENUE_PROFILES.md)
 - [`docs/SCIENTIFIC_SEMANTICS.md`](docs/SCIENTIFIC_SEMANTICS.md)
 - [`docs/REVIEWER_MODE.md`](docs/REVIEWER_MODE.md)
+- [`docs/VISUAL_REGRESSION.md`](docs/VISUAL_REGRESSION.md)
 - [`THIRD_PARTY.yml`](THIRD_PARTY.yml)
 
 ## Implemented core
@@ -45,8 +47,9 @@ See:
 - self-contained replay bundle with a snapshotted CSV input;
 - SHA-256 input provenance and a run-wide artifact manifest;
 - reviewer mode: bundle-integrity re-verification plus colour-vision, contrast, typography, and size checks;
+- visual regression: structural SVG fingerprints compared against reviewable JSON baselines;
 - direct dependency versions and platform details in `environment.lock`;
-- CLI commands: `init`, `validate`, `render`, `audit`, and `review`;
+- CLI commands: `init`, `validate`, `render`, `audit`, `review`, and `regress`;
 - tests and GitHub Actions CI;
 - contribution gates for citation, provenance, licensing, and clean-room review.
 
@@ -74,6 +77,7 @@ paperfig validate examples/specs/grouped_bar.yaml
 paperfig render examples/specs/grouped_bar.yaml --output runs/demo
 paperfig audit examples/specs/grouped_bar.yaml --artifacts runs/demo
 paperfig review runs/demo
+paperfig regress examples/specs/grouped_bar.yaml --update
 ```
 
 `paperfig render` preserves the complete run and exits non-zero when the generated audit contains an error. The emitted replay bundle uses its local `figure.data.csv`, so it does not depend on the original dataset path.
@@ -98,7 +102,17 @@ runs/demo/
 
 `paperfig review` adds `figure.review.json` and `figure.review.md` to that directory. Both are excluded from the render-time manifest, so reviewing a bundle never invalidates its own integrity check.
 
-## Reviewer mode
+## Three verification stages
+
+The checking commands answer different questions and deliberately do not overlap:
+
+| Stage | Input | Question |
+| --- | --- | --- |
+| `audit` | a FigureSpec | Is this figure allowed to be made this way? |
+| `review` | one run bundle | Is this bundle intact and readable? |
+| `regress` | two renders | Did this figure change since last time? |
+
+### Reviewer mode
 
 `paperfig review <bundle>` re-reads a finished run and reports deterministic findings. It never re-renders, never edits artifacts, and never calls a model.
 
@@ -110,10 +124,31 @@ runs/demo/
 ```bash
 paperfig review runs/demo                  # exits 2 only on error findings
 paperfig review runs/demo --fail-on warning
-paperfig review runs/demo --fail-on never
 ```
 
 Every rule, threshold, and limitation is documented in [`docs/REVIEWER_MODE.md`](docs/REVIEWER_MODE.md). A passing review is not peer review, and it does not validate the scientific claim behind the figure.
+
+### Visual regression
+
+`paperfig regress <spec>` renders a spec and compares a **structural fingerprint** of the SVG against a recorded baseline in `tests/baselines/`.
+
+File hashing cannot do this job: Matplotlib writes a creation timestamp into SVG metadata, so the same spec never renders to the same bytes twice. Pixel diffing only works inside one exact rendering stack. The fingerprint instead records text, colours, font sizes, element counts, canvas size, and a quantised digest of path geometry.
+
+Because baselines are JSON, a rendering change shows up in a pull request as a readable diff rather than an opaque image blob:
+
+```diff
+-    "Accuracy",
++    "Precision",
+```
+
+Text, colour, and font-size changes are errors. Element-count, canvas, and geometry changes are warnings that downgrade to notes when the baseline was recorded under a different Matplotlib version, so a dependency bump cannot fail a build for no substantive reason.
+
+```bash
+paperfig regress examples/specs/grouped_bar.yaml --update   # record
+paperfig regress examples/specs/grouped_bar.yaml            # check
+```
+
+See [`docs/VISUAL_REGRESSION.md`](docs/VISUAL_REGRESSION.md) for the full rule set and limitations.
 
 ## FigureSpec example
 

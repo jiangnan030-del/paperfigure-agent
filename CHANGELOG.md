@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+### Phase 2 — visual regression
+
+#### Added
+
+- `paperfig regress <spec>`, which compares a rendering against a recorded baseline;
+- structural SVG fingerprints covering text, colours, font sizes, element counts, canvas size, and quantised path geometry;
+- reviewable JSON baselines in `tests/baselines/`, so a rendering change appears as a readable diff;
+- environment-aware severity: layout-sensitive findings downgrade to notes when the baseline was recorded under a different Matplotlib version;
+- `--update` to record a baseline and `--fail-on {error,warning,never}` to control the exit code;
+- `docs/VISUAL_REGRESSION.md` documenting the method, every rule, and the limitations.
+
+#### Changed
+
+- CI records fingerprints for every example, uploads them, and enforces any committed baseline;
+- audit limitations now name which checks live in `review` and `regress` instead of claiming colour-vision checks are unimplemented.
+
 ### Phase 2 — reviewer mode
 
 #### Added

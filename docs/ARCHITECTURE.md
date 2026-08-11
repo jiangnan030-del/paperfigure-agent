@@ -6,13 +6,27 @@
 FigureSpec -> local data loader -> venue profile -> renderer
            -> static/scientific audit -> artifacts + provenance
            -> deterministic reviewer pass -> review report
+           -> structural fingerprint -> baseline comparison
 ```
 
 The MVP deliberately has no arbitrary-code execution and no model dependency.
 
-`audit` runs against a FigureSpec before and during a render. `review` runs
-after a render, against the produced bundle, and is the only stage that reads
-exported artifacts back in.
+## Verification stages
+
+The three checking stages answer different questions and deliberately do not
+overlap:
+
+| Stage | Input | Question |
+| --- | --- | --- |
+| `audit` | FigureSpec | Is this figure allowed to be made this way? |
+| `review` | one run bundle | Is this bundle intact and readable? |
+| `regress` | two renders | Did this figure change since last time? |
+
+`audit` runs before and during a render. `review` runs after a render, against
+the produced bundle, and is the only stage that reads exported artifacts back
+in. `regress` is the only stage that compares across runs, which is why it
+cannot rely on file digests: exported SVG carries a creation timestamp and is
+never byte-identical between two renders of the same spec.
 
 ## Planned layers
 
@@ -30,4 +44,5 @@ exported artifacts back in.
 - Renderers receive validated records, not arbitrary Python expressions.
 - Rule-based checks precede model-based visual critique.
 - Reviewer Mode reads a bundle; it never repairs or re-renders it.
+- Baselines are reviewable JSON, so a rendering change is visible in code review.
 - Statistical and semantic edits cannot be silently auto-applied.
