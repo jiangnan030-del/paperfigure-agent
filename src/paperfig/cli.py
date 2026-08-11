@@ -6,7 +6,9 @@ import json
 from dataclasses import asdict
 from pathlib import Path
 
+from paperfig.comparison import compare_bundles, write_comparison
 from paperfig.harness import render_spec
+from paperfig.packaging import PackageError, build_submission_package
 from paperfig.qa import AuditError, audit_spec
 from paperfig.regression import (
     DEFAULT_BASELINE_DIR,
@@ -71,10 +73,19 @@ def _init_project(destination: Path) -> None:
     )
 
 
+def _add_fail_on(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--fail-on",
+        choices=("error", "warning", "never"),
+        default="error",
+        help="severity that makes the command exit non-zero (default: error)",
+    )
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="paperfig",
-        description="Render, audit, and review scientific figures",
+        description="Render, audit, review, compare, and package scientific figures",
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
@@ -94,12 +105,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     review_parser = subparsers.add_parser("review", help="review a rendered run bundle")
     review_parser.add_argument("bundle", type=Path)
-    review_parser.add_argument(
-        "--fail-on",
-        choices=("error", "warning", "never"),
-        default="error",
-        help="severity that makes the command exit non-zero (default: error)",
-    )
+    _add_fail_on(review_parser)
 
     regress_parser = subparsers.add_parser(
         "regress", help="compare a rendering against its recorded baseline"
@@ -116,12 +122,31 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="record the current rendering as the new baseline",
     )
-    regress_parser.add_argument(
-        "--fail-on",
-        choices=("error", "warning", "never"),
-        default="error",
-        help="severity that makes the command exit non-zero (default: error)",
+    _add_fail_on(regress_parser)
+
+    compare_parser = subparsers.add_parser(
+        "compare", help="compare baseline and candidate run bundles"
     )
+    compare_parser.add_argument("baseline", type=Path)
+    compare_parser.add_argument("candidate", type=Path)
+    compare_parser.add_argument(
+        "--output",
+        type=Path,
+        help="optional directory for JSON and Markdown comparison reports",
+    )
+    _add_fail_on(compare_parser)
+
+    package_parser = subparsers.add_parser(
+        "package", help="build an integrity-checked submission archive"
+    )
+    package_parser.add_argument("bundle", type=Path)
+    package_parser.add_argument("--output", type=Path, required=True)
+    package_parser.add_argument(
+        "--approve",
+        action="store_true",
+        help="acknowledge human review of the figure and scientific content",
+    )
+    _add_fail_on(package_parser)
     return parser
 
 
@@ -163,5 +188,29 @@ def main(argv: list[str] | None = None) -> None:
             if exceeds_threshold(findings, args.fail_on):
                 raise SystemExit(2)
             return
-    except (AuditError, RegressionError, ReviewError, SpecError, FileExistsError) as exc:
+        if args.command == "compare":
+            comparison = compare_bundles(args.baseline, args.candidate)
+            if args.output is not None:
+                write_comparison(args.output, comparison)
+            print(json.dumps(comparison.to_dict(), ensure_ascii=False, indent=2))
+            if exceeds_threshold(comparison.findings, args.fail_on):
+                raise SystemExit(2)
+            return
+        if args.command == "package":
+            result = build_submission_package(
+                args.bundle,
+                args.output,
+                human_approved=args.approve,
+                fail_on=args.fail_on,
+            )
+            print(json.dumps(result.to_dict(), ensure_ascii=False, indent=2))
+            return
+    except (
+        AuditError,
+        PackageError,
+        RegressionError,
+        ReviewError,
+        SpecError,
+        FileExistsError,
+    ) as exc:
         raise SystemExit(str(exc)) from exc

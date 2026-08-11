@@ -16,7 +16,8 @@ REVIEW_MARKDOWN_NAME = "figure.review.md"
 LIMITATIONS = (
     "Reviewer Mode is deterministic and rule-based; it is not peer review.",
     "Dichromat simulation is a linear approximation and omits anomalous trichromacy.",
-    "Continuous colormaps, panel composition, and statistics are not reviewed yet.",
+    "Continuous-colormap checks sample the configured map; they do not model displays.",
+    "Panel composition and statistical interpretation are not reviewed yet.",
     "A passing review does not validate the scientific claim behind the figure.",
 )
 
