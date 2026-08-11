@@ -7,8 +7,6 @@ on:
 
 permissions:
   contents: read
-  issues: write
-  pull-requests: write
 
 jobs:
   test:
@@ -51,30 +49,9 @@ jobs:
           for spec in examples/specs/*.yaml; do
             name="$(basename "${spec}" .yaml)"
             paperfig regress "${spec}" --update --baselines runs/ci/baselines
-            if [ -f "tests/baselines/${name}.baseline.json" ]; then
-              paperfig regress "${spec}" \
-                --baselines tests/baselines --fail-on warning
-            fi
+            paperfig regress "${spec}" \
+              --baselines tests/baselines --fail-on warning
           done
-      - name: Publish first baseline payload to this pull request
-        if: >-
-          github.event_name == 'pull_request' &&
-          hashFiles('tests/baselines/*.baseline.json') == ''
-        shell: bash
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          tar -czf /tmp/paperfig-baselines.tar.gz -C runs/ci baselines
-          {
-            echo '<!-- paperfig-baseline-bootstrap -->'
-            echo 'CI_BASELINES_TAR_GZ_BASE64'
-            echo '```text'
-            base64 -w 76 /tmp/paperfig-baselines.tar.gz
-            echo '```'
-          } > /tmp/paperfig-baselines-comment.md
-          gh pr comment "${{ github.event.pull_request.number }}" \
-            --body-file /tmp/paperfig-baselines-comment.md
       - name: Upload smoke artifacts
         uses: actions/upload-artifact@v4
         with:

@@ -89,11 +89,12 @@ checksum identifies the ZIP as a whole.
 
 ## Visual-regression baselines
 
-Baselines remain reviewable JSON in `tests/baselines/`. They must be recorded in
-the Ubuntu CI environment that enforces them. During first adoption, CI emits a
-compressed baseline payload into the pull request; it is committed back into
-the same pull request, after which the temporary publishing step is removed and
-`--fail-on warning` becomes a real cross-run gate for all seven example specs.
+Seven reviewable JSON baselines were recorded on GitHub Actions and merged via
+PR #5 before this completion branch was created. They cover every example spec
+under matplotlib 3.11.1 and Python 3.12.13. CI renders each example again and
+runs `paperfig regress --fail-on warning` against its committed baseline. The
+check is therefore a real cross-run gate rather than generate-and-compare in one
+job.
 
 ## What still requires human judgment
 

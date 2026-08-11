@@ -17,7 +17,7 @@
 #### Changed
 
 - CI now smoke-tests render, audit, replay, review, compare, package, and regression for every supported mark;
-- the first CI run publishes real Ubuntu-generated visual baselines for adoption in the same pull request;
+- all seven CI-recorded visual baselines are enforced with `--fail-on warning`;
 - Reviewer Mode no longer emits the `SEQUENTIAL_COLORMAP_NOT_REVIEWED` placeholder for heatmaps;
 - Reviewer Mode limitations now distinguish implemented colormap checks from remaining human judgments.
 
