@@ -5,9 +5,14 @@
 ```text
 FigureSpec -> local data loader -> venue profile -> renderer
            -> static/scientific audit -> artifacts + provenance
+           -> deterministic reviewer pass -> review report
 ```
 
 The MVP deliberately has no arbitrary-code execution and no model dependency.
+
+`audit` runs against a FigureSpec before and during a render. `review` runs
+after a render, against the produced bundle, and is the only stage that reads
+exported artifacts back in.
 
 ## Planned layers
 
@@ -24,4 +29,5 @@ The MVP deliberately has no arbitrary-code execution and no model dependency.
 - A FigureSpec is declarative; it must not embed executable code.
 - Renderers receive validated records, not arbitrary Python expressions.
 - Rule-based checks precede model-based visual critique.
+- Reviewer Mode reads a bundle; it never repairs or re-renders it.
 - Statistical and semantic edits cannot be silently auto-applied.

@@ -1,5 +1,26 @@
 # Changelog
 
+## Unreleased
+
+### Phase 2 — reviewer mode
+
+#### Added
+
+- `paperfig review <bundle>`, a deterministic reviewer pass over a rendered run bundle;
+- run-bundle integrity verification against the recorded SHA-256 artifact manifest;
+- dichromat separation checks for deuteranopia, protanopia, and tritanopia in CIE L\*a\*b\*;
+- WCAG non-text contrast, near-neutral colour, and greyscale luminance checks;
+- venue typography and figure-width checks measured from the exported SVG;
+- redundant-encoding warnings for multi-series line and scatter marks;
+- `figure.review.json` and `figure.review.md` reviewer reports;
+- `--fail-on {error,warning,never}` to control the review exit code;
+- `docs/REVIEWER_MODE.md` documenting every rule, threshold, and limitation.
+
+#### Changed
+
+- CI now reviews every example after rendering, auditing, and replaying it;
+- `paperfig audit` and `paperfig review` are documented as separate stages.
+
 ## Unreleased — Phase 1 executable core
 
 ### Added

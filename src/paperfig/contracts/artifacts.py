@@ -10,3 +10,10 @@ REQUIRED_RUN_ARTIFACTS = (
     "environment.lock",
     "artifact.manifest.json",
 )
+
+# Written by `paperfig review`, not by `paperfig render`, so these stay out of
+# REQUIRED_RUN_ARTIFACTS and out of the render-time artifact manifest.
+REVIEW_ARTIFACTS = (
+    "figure.review.json",
+    "figure.review.md",
+)
