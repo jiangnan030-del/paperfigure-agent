@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "spec_name": "scatter",
+  "canvas_width_pt": 404.39,
+  "canvas_height_pt": 277.68,
+  "element_counts": {
+    "Agent": 1,
+    "RDF": 1,
+    "Work": 1,
+    "clipPath": 1,
+    "creator": 1,
+    "date": 1,
+    "defs": 23,
+    "format": 1,
+    "g": 112,
+    "metadata": 1,
+    "path": 53,
+    "rect": 1,
+    "style": 1,
+    "svg": 1,
+    "title": 1,
+    "type": 1,
+    "use": 117
+  },
+  "text_content": [],
+  "colors": [
+    "#000000",
+    "#0072b2",
+    "#cc79a7",
+    "#d55e00",
+    "#d9d9d9",
+    "#e69f00",
+    "#ffffff"
+  ],
+  "font_sizes_pt": [],
+  "geometry_digest": "b8568a6814c53ac4136e0205dc4cf077e5d6f54952d32aed3d3b0c54fcd0ff05",
+  "geometry_points": 2460,
+  "environment": {
+    "matplotlib": "3.11.1",
+    "python": "3.12.13",
+    "platform": "Linux-x86_64"
+  }
+}

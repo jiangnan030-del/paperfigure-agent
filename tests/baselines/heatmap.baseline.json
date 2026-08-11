@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "spec_name": "heatmap",
+  "canvas_width_pt": 260.08,
+  "canvas_height_pt": 179.76,
+  "element_counts": {
+    "Agent": 1,
+    "RDF": 1,
+    "Work": 1,
+    "clipPath": 1,
+    "creator": 1,
+    "date": 1,
+    "defs": 17,
+    "format": 1,
+    "g": 81,
+    "image": 2,
+    "metadata": 1,
+    "path": 38,
+    "rect": 1,
+    "style": 1,
+    "svg": 1,
+    "title": 1,
+    "type": 1,
+    "use": 96
+  },
+  "text_content": [],
+  "colors": [
+    "#000000",
+    "#ffffff"
+  ],
+  "font_sizes_pt": [],
+  "geometry_digest": "f00652fc3852455cd9285a57c9f16126d31fa94941d4d7030927814f3c8f1cdb",
+  "geometry_points": 2066,
+  "environment": {
+    "matplotlib": "3.11.1",
+    "python": "3.12.13",
+    "platform": "Linux-x86_64"
+  }
+}

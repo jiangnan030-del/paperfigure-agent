@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "spec_name": "violin",
+  "canvas_width_pt": 404.4,
+  "canvas_height_pt": 277.68,
+  "element_counts": {
+    "Agent": 1,
+    "RDF": 1,
+    "Work": 1,
+    "clipPath": 1,
+    "creator": 1,
+    "date": 1,
+    "defs": 15,
+    "format": 1,
+    "g": 67,
+    "metadata": 1,
+    "path": 53,
+    "rect": 1,
+    "style": 1,
+    "svg": 1,
+    "title": 1,
+    "type": 1,
+    "use": 62
+  },
+  "text_content": [],
+  "colors": [
+    "#000000",
+    "#0072b2",
+    "#1f77b4",
+    "#d55e00",
+    "#d9d9d9",
+    "#e69f00",
+    "#ffffff"
+  ],
+  "font_sizes_pt": [],
+  "geometry_digest": "7552e30c35a3c3c53b92f724dfd27cd45a10c93ae5f43021e5006f412109ebe1",
+  "geometry_points": 2976,
+  "environment": {
+    "matplotlib": "3.11.1",
+    "python": "3.12.13",
+    "platform": "Linux-x86_64"
+  }
+}

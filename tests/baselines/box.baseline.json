@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "spec_name": "box",
+  "canvas_width_pt": 242.4,
+  "canvas_height_pt": 167.52,
+  "element_counts": {
+    "Agent": 1,
+    "RDF": 1,
+    "Work": 1,
+    "clipPath": 1,
+    "creator": 1,
+    "date": 1,
+    "defs": 12,
+    "format": 1,
+    "g": 78,
+    "metadata": 1,
+    "path": 56,
+    "rect": 1,
+    "style": 1,
+    "svg": 1,
+    "title": 1,
+    "type": 1,
+    "use": 59
+  },
+  "text_content": [],
+  "colors": [
+    "#000000",
+    "#0072b2",
+    "#d55e00",
+    "#d9d9d9",
+    "#e69f00",
+    "#ff7f0e",
+    "#ffffff"
+  ],
+  "font_sizes_pt": [],
+  "geometry_digest": "8e509ecbb7431b64c8c5c73a60123a152e791ae079c80404146db7080f7ee7f8",
+  "geometry_points": 1806,
+  "environment": {
+    "matplotlib": "3.11.1",
+    "python": "3.12.13",
+    "platform": "Linux-x86_64"
+  }
+}

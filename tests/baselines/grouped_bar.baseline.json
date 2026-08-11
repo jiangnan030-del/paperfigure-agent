@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "spec_name": "grouped_bar",
+  "canvas_width_pt": 260.4,
+  "canvas_height_pt": 189.84,
+  "element_counts": {
+    "Agent": 1,
+    "RDF": 1,
+    "Work": 1,
+    "clipPath": 1,
+    "creator": 1,
+    "date": 1,
+    "defs": 14,
+    "format": 1,
+    "g": 78,
+    "metadata": 1,
+    "path": 51,
+    "rect": 1,
+    "style": 1,
+    "svg": 1,
+    "title": 1,
+    "type": 1,
+    "use": 65
+  },
+  "text_content": [],
+  "colors": [
+    "#000000",
+    "#0072b2",
+    "#1f77b4",
+    "#d55e00",
+    "#d9d9d9",
+    "#e69f00",
+    "#ffffff"
+  ],
+  "font_sizes_pt": [],
+  "geometry_digest": "8ad2c43b4d87687dd6c56d33a1dc3a8f6d0cd7bcb0880af07f4557c8b2858cfe",
+  "geometry_points": 1656,
+  "environment": {
+    "matplotlib": "3.11.1",
+    "python": "3.12.13",
+    "platform": "Linux-x86_64"
+  }
+}
