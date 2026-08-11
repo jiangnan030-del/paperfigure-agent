@@ -44,7 +44,10 @@ def _simulated_labs(colors: list[Rgb], cvd_type: str | None) -> list[Lab]:
 
 
 def _steps(values: list[Lab]) -> list[float]:
-    return [delta_e76(left, right) for left, right in zip(values, values[1:], strict=True)]
+    return [
+        delta_e76(left, right)
+        for left, right in zip(values, values[1:], strict=False)
+    ]
 
 
 def _coefficient_of_variation(values: list[float]) -> float:
@@ -57,7 +60,10 @@ def _coefficient_of_variation(values: list[float]) -> float:
 
 def _lightness_reversals(values: list[Lab]) -> tuple[str, int, float]:
     direction = 1.0 if values[-1][0] >= values[0][0] else -1.0
-    changes = [direction * (right[0] - left[0]) for left, right in zip(values, values[1:])]
+    changes = [
+        direction * (right[0] - left[0])
+        for left, right in zip(values, values[1:], strict=False)
+    ]
     reversals = [change for change in changes if change < -LIGHTNESS_REVERSAL_TOLERANCE]
     label = "increasing" if direction > 0.0 else "decreasing"
     worst = min(changes, default=0.0)
