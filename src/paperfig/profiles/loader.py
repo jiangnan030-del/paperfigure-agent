@@ -6,7 +6,6 @@ from typing import Any
 
 import yaml
 
-
 _PROFILE_ALIASES = {
     "nature machine intelligence": "nature_machine_intelligence",
     "nature-machine-intelligence": "nature_machine_intelligence",
