@@ -8,6 +8,7 @@ from pathlib import Path
 
 from paperfig.harness import render_spec
 from paperfig.qa import AuditError, audit_spec
+from paperfig.review import ReviewError, exceeds_threshold, review_bundle, write_review
 from paperfig.spec import SpecError, load_spec
 
 _STARTER_DATA = """model,dataset,accuracy,std
@@ -67,7 +68,7 @@ def _init_project(destination: Path) -> None:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="paperfig",
-        description="Render and audit scientific figures",
+        description="Render, audit, and review scientific figures",
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
@@ -84,6 +85,15 @@ def build_parser() -> argparse.ArgumentParser:
     audit_parser = subparsers.add_parser("audit", help="audit a FigureSpec and artifacts")
     audit_parser.add_argument("spec", type=Path)
     audit_parser.add_argument("--artifacts", type=Path)
+
+    review_parser = subparsers.add_parser("review", help="review a rendered run bundle")
+    review_parser.add_argument("bundle", type=Path)
+    review_parser.add_argument(
+        "--fail-on",
+        choices=("error", "warning", "never"),
+        default="error",
+        help="severity that makes the command exit non-zero (default: error)",
+    )
     return parser
 
 
@@ -108,5 +118,13 @@ def main(argv: list[str] | None = None) -> None:
             print(json.dumps([issue.to_dict() for issue in issues], ensure_ascii=False, indent=2))
             if any(issue.severity == "error" for issue in issues):
                 raise SystemExit(2)
-    except (AuditError, SpecError, FileExistsError) as exc:
+            return
+        if args.command == "review":
+            findings = review_bundle(args.bundle)
+            write_review(args.bundle, findings)
+            payload = [finding.to_dict() for finding in findings]
+            print(json.dumps(payload, ensure_ascii=False, indent=2))
+            if exceeds_threshold(findings, args.fail_on):
+                raise SystemExit(2)
+    except (AuditError, ReviewError, SpecError, FileExistsError) as exc:
         raise SystemExit(str(exc)) from exc

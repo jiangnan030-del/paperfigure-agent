@@ -14,6 +14,7 @@ claim + data + venue profile
         -> deterministic renderer
         -> rule-based audit
         -> SVG/PDF/PNG + provenance
+        -> deterministic reviewer pass
 ```
 
 The long-term architecture follows `Prompt -> Context -> Harness -> Loop -> Graph -> Evolver`, but the MVP intentionally starts with the auditable core.
@@ -29,6 +30,7 @@ See:
 - [`docs/REFERENCES.md`](docs/REFERENCES.md)
 - [`docs/VENUE_PROFILES.md`](docs/VENUE_PROFILES.md)
 - [`docs/SCIENTIFIC_SEMANTICS.md`](docs/SCIENTIFIC_SEMANTICS.md)
+- [`docs/REVIEWER_MODE.md`](docs/REVIEWER_MODE.md)
 - [`THIRD_PARTY.yml`](THIRD_PARTY.yml)
 
 ## Implemented core
@@ -42,8 +44,9 @@ See:
 - data-fidelity validation for duplicate coordinates, non-finite values, negative errors, and invalid intervals;
 - self-contained replay bundle with a snapshotted CSV input;
 - SHA-256 input provenance and a run-wide artifact manifest;
+- reviewer mode: bundle-integrity re-verification plus colour-vision, contrast, typography, and size checks;
 - direct dependency versions and platform details in `environment.lock`;
-- CLI commands: `init`, `validate`, `render`, and `audit`;
+- CLI commands: `init`, `validate`, `render`, `audit`, and `review`;
 - tests and GitHub Actions CI;
 - contribution gates for citation, provenance, licensing, and clean-room review.
 
@@ -70,6 +73,7 @@ python -m pip install -e '.[dev]'
 paperfig validate examples/specs/grouped_bar.yaml
 paperfig render examples/specs/grouped_bar.yaml --output runs/demo
 paperfig audit examples/specs/grouped_bar.yaml --artifacts runs/demo
+paperfig review runs/demo
 ```
 
 `paperfig render` preserves the complete run and exits non-zero when the generated audit contains an error. The emitted replay bundle uses its local `figure.data.csv`, so it does not depend on the original dataset path.
@@ -91,6 +95,25 @@ runs/demo/
 ├── run.log.jsonl
 └── environment.lock
 ```
+
+`paperfig review` adds `figure.review.json` and `figure.review.md` to that directory. Both are excluded from the render-time manifest, so reviewing a bundle never invalidates its own integrity check.
+
+## Reviewer mode
+
+`paperfig review <bundle>` re-reads a finished run and reports deterministic findings. It never re-renders, never edits artifacts, and never calls a model.
+
+- **Integrity.** Every manifest entry is re-hashed with SHA-256, missing artifacts are errors, and untracked files are warnings.
+- **Colour vision.** Series colours are simulated for deuteranopia, protanopia, and tritanopia in linear RGB and compared as CIE L\*a\*b\* delta-E76.
+- **Contrast and greyscale.** WCAG 3:1 non-text contrast, near-neutral series colours, and luminance separation for venues that require greyscale legibility.
+- **Venue fit.** Label sizes and figure width measured from the exported SVG against the venue profile.
+
+```bash
+paperfig review runs/demo                  # exits 2 only on error findings
+paperfig review runs/demo --fail-on warning
+paperfig review runs/demo --fail-on never
+```
+
+Every rule, threshold, and limitation is documented in [`docs/REVIEWER_MODE.md`](docs/REVIEWER_MODE.md). A passing review is not peer review, and it does not validate the scientific claim behind the figure.
 
 ## FigureSpec example
 
