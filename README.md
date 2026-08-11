@@ -38,9 +38,11 @@ See:
 - deterministic Matplotlib renderers for bar, line, scatter, heatmap, box, violin, and interval charts;
 - source-cited 2026 starter profiles for Nature Machine Intelligence, ICML, NeurIPS, and ECCV;
 - SVG, PDF, and PNG export;
-- rule-based audit with severity and evidence;
+- rule-based audit with severity, evidence, and an error-level render gate;
 - data-fidelity validation for duplicate coordinates, non-finite values, negative errors, and invalid intervals;
-- SHA-256 input provenance and replay artifacts;
+- self-contained replay bundle with a snapshotted CSV input;
+- SHA-256 input provenance and a run-wide artifact manifest;
+- direct dependency versions and platform details in `environment.lock`;
 - CLI commands: `init`, `validate`, `render`, and `audit`;
 - tests and GitHub Actions CI;
 - contribution gates for citation, provenance, licensing, and clean-room review.
@@ -70,11 +72,14 @@ paperfig render examples/specs/grouped_bar.yaml --output runs/demo
 paperfig audit examples/specs/grouped_bar.yaml --artifacts runs/demo
 ```
 
+`paperfig render` preserves the complete run and exits non-zero when the generated audit contains an error. The emitted replay bundle uses its local `figure.data.csv`, so it does not depend on the original dataset path.
+
 Generated files:
 
 ```text
 runs/demo/
 ├── figure.spec.yaml
+├── figure.data.csv
 ├── figure.py
 ├── figure.svg
 ├── figure.pdf
@@ -82,6 +87,7 @@ runs/demo/
 ├── figure.alt.txt
 ├── figure.audit.json
 ├── figure.provenance.json
+├── artifact.manifest.json
 ├── run.log.jsonl
 └── environment.lock
 ```

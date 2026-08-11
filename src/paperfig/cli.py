@@ -7,7 +7,7 @@ from dataclasses import asdict
 from pathlib import Path
 
 from paperfig.harness import render_spec
-from paperfig.qa import audit_spec
+from paperfig.qa import AuditError, audit_spec
 from paperfig.spec import SpecError, load_spec
 
 _STARTER_DATA = """model,dataset,accuracy,std
@@ -108,5 +108,5 @@ def main(argv: list[str] | None = None) -> None:
             print(json.dumps([issue.to_dict() for issue in issues], ensure_ascii=False, indent=2))
             if any(issue.severity == "error" for issue in issues):
                 raise SystemExit(2)
-    except (SpecError, FileExistsError) as exc:
+    except (AuditError, SpecError, FileExistsError) as exc:
         raise SystemExit(str(exc)) from exc

@@ -23,13 +23,19 @@ jobs:
         run: ruff check .
       - name: Test
         run: pytest
-      - name: Smoke render all supported marks
+      - name: Smoke render, audit, and replay all supported marks
         shell: bash
         run: |
           set -euo pipefail
           for spec in examples/specs/*.yaml; do
             name="$(basename "${spec}" .yaml)"
-            paperfig render "${spec}" --output "runs/ci/${name}"
+            output="runs/ci/${name}"
+            paperfig render "${spec}" --output "${output}"
+            paperfig audit "${spec}" --artifacts "${output}"
+            (
+              cd "${output}"
+              python figure.py
+            )
           done
       - name: Upload smoke artifacts
         uses: actions/upload-artifact@v4
