@@ -8,6 +8,10 @@ from paperfig.qa.models import AuditIssue
 from paperfig.spec.models import FigureSpec
 
 
+class AuditError(RuntimeError):
+    """Raised after preserving a run whose audit contains an error."""
+
+
 def audit_spec(spec: FigureSpec, artifact_dir: str | Path | None = None) -> list[AuditIssue]:
     issues: list[AuditIssue] = []
 
@@ -119,7 +123,7 @@ def write_audit(
     output: str | Path,
     artifact_dir: str | Path | None = None,
     data_validation_passed: bool | None = None,
-) -> None:
+) -> list[AuditIssue]:
     issues = audit_spec(spec, artifact_dir=artifact_dir)
     payload = {
         "schema_version": 1,
@@ -141,3 +145,4 @@ def write_audit(
         ],
     }
     Path(output).write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    return issues
