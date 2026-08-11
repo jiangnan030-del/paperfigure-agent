@@ -1,70 +1,55 @@
 # PaperFigure Agent
 
-A clean-room, spec-driven toolkit for reproducible, auditable, publication-ready scientific figures.
+A clean-room, spec-driven toolkit for reproducible, auditable,
+publication-ready scientific figures.
 
-> **Status:** early MVP scaffold (v0.1.0). The repository starts with deterministic data-chart rendering and rule-based review. It does **not** yet execute model-generated code or claim autonomous scientific judgment.
+> **Status:** v0.1.0 + Unreleased. The deterministic Phase 2 workflow is
+> implemented. The project does not execute model-generated code or claim
+> autonomous scientific judgment.
 
-## Why this repository exists
-
-Scientific figure tooling often optimizes appearance before data fidelity, provenance, and reviewability. PaperFigure Agent reverses that order:
+## Pipeline
 
 ```text
 claim + data + venue profile
-        -> FigureSpec
-        -> deterministic renderer
-        -> rule-based audit
-        -> SVG/PDF/PNG + provenance
-        -> deterministic reviewer pass
-        -> structural baseline comparison
+  -> FigureSpec
+  -> deterministic renderer
+  -> static/scientific audit
+  -> SVG/PDF/PNG + replay + provenance
+  -> deterministic Reviewer Mode
+  -> structural visual-regression baseline
+  -> baseline/candidate comparison
+  -> explicit human approval
+  -> deterministic submission package
 ```
-
-The long-term architecture follows `Prompt -> Context -> Harness -> Loop -> Graph -> Evolver`, but the MVP intentionally starts with the auditable core.
-
-## Clean-room and attribution notice
-
-This is an independent implementation. No source code, images, datasets, or documentation text from [`ChenLiu-1996/figures4papers`](https://github.com/ChenLiu-1996/figures4papers) has been copied into this repository. At project initialization, no explicit upstream license was identified, so that repository is treated as **conceptual prior art only** until written permission or a compatible license is verified.
-
-See:
-
-- [`docs/CLEAN_ROOM.md`](docs/CLEAN_ROOM.md)
-- [`docs/ACADEMIC_INTEGRITY.md`](docs/ACADEMIC_INTEGRITY.md)
-- [`docs/REFERENCES.md`](docs/REFERENCES.md)
-- [`docs/VENUE_PROFILES.md`](docs/VENUE_PROFILES.md)
-- [`docs/SCIENTIFIC_SEMANTICS.md`](docs/SCIENTIFIC_SEMANTICS.md)
-- [`docs/REVIEWER_MODE.md`](docs/REVIEWER_MODE.md)
-- [`docs/VISUAL_REGRESSION.md`](docs/VISUAL_REGRESSION.md)
-- [`THIRD_PARTY.yml`](THIRD_PARTY.yml)
 
 ## Implemented core
 
-- typed `FigureSpec` loader and validation;
-- local CSV data loading (remote inputs are rejected);
-- deterministic Matplotlib renderers for bar, line, scatter, heatmap, box, violin, and interval charts;
-- source-cited 2026 starter profiles for Nature Machine Intelligence, ICML, NeurIPS, and ECCV;
+- typed `FigureSpec` validation;
+- local CSV loading with data-fidelity hard gates;
+- bar, line, scatter, heatmap, box, violin, and interval renderers;
+- Nature Machine Intelligence, ICML, NeurIPS, and ECCV starter profiles;
 - SVG, PDF, and PNG export;
-- rule-based audit with severity, evidence, and an error-level render gate;
-- data-fidelity validation for duplicate coordinates, non-finite values, negative errors, and invalid intervals;
-- self-contained replay bundle with a snapshotted CSV input;
-- SHA-256 input provenance and a run-wide artifact manifest;
-- reviewer mode: bundle-integrity re-verification plus colour-vision, contrast, typography, and size checks;
-- visual regression: structural SVG fingerprints compared against reviewable JSON baselines;
-- direct dependency versions and platform details in `environment.lock`;
-- CLI commands: `init`, `validate`, `render`, `audit`, `review`, and `regress`;
-- tests and GitHub Actions CI;
-- contribution gates for citation, provenance, licensing, and clean-room review.
+- self-contained replay bundles with snapshotted data;
+- SHA-256 provenance and artifact manifests;
+- categorical colour, CVD, contrast, greyscale, typography, size, and alt-text review;
+- continuous-colormap review under normal and simulated dichromat vision;
+- structural SVG fingerprints and reviewable JSON baselines;
+- deterministic baseline/candidate bundle comparison;
+- human-gated, reproducible submission ZIPs with a second integrity manifest;
+- tests and a complete GitHub Actions smoke workflow.
 
-## Supported marks
+## Commands
 
-| Mark | Primary use | Required extra fields |
-| --- | --- | --- |
-| `bar` | grouped comparisons | optional `series`, `error` |
-| `line` | trends and trajectories | optional `series`, `error` |
-| `scatter` | relationships and trade-offs | optional `series`, `size` |
-| `heatmap` | matrix comparison | `value` |
-| `box` / `violin` | raw-observation distributions | none |
-| `interval` | forest and uncertainty plots | `lower`, `upper` |
-
-All bundled datasets are synthetic and explicitly labeled as non-evidence.
+| Command | Purpose |
+| --- | --- |
+| `paperfig init` | create a synthetic starter project |
+| `paperfig validate` | validate a FigureSpec |
+| `paperfig render` | create a complete replayable run bundle |
+| `paperfig audit` | run pre-render and artifact rules |
+| `paperfig review` | inspect one finished bundle |
+| `paperfig regress` | compare a render with its accepted baseline |
+| `paperfig compare` | compare baseline and candidate bundles |
+| `paperfig package` | build a human-approved submission archive |
 
 ## Quick start
 
@@ -74,15 +59,46 @@ source .venv/bin/activate
 python -m pip install -e '.[dev]'
 
 paperfig validate examples/specs/grouped_bar.yaml
-paperfig render examples/specs/grouped_bar.yaml --output runs/demo
-paperfig audit examples/specs/grouped_bar.yaml --artifacts runs/demo
-paperfig review runs/demo
+paperfig render examples/specs/grouped_bar.yaml --output runs/baseline
+paperfig review runs/baseline
 paperfig regress examples/specs/grouped_bar.yaml --update
 ```
 
-`paperfig render` preserves the complete run and exits non-zero when the generated audit contains an error. The emitted replay bundle uses its local `figure.data.csv`, so it does not depend on the original dataset path.
+Create and compare a candidate:
 
-Generated files:
+```bash
+paperfig render examples/specs/grouped_bar.yaml --output runs/candidate
+paperfig compare runs/baseline runs/candidate --output runs/comparison
+```
+
+Package only after inspecting the figure and its reports:
+
+```bash
+paperfig package runs/candidate \
+  --output dist/figure.submission.zip \
+  --approve
+```
+
+`--approve` is mandatory. It records an explicit human gate; it is not inferred
+from green automation.
+
+## Verification and delivery stages
+
+| Stage | Question |
+| --- | --- |
+| `audit` | Is the requested figure allowed and internally consistent? |
+| `review` | Is this bundle intact, accessible, and venue-aware? |
+| `regress` | Did the accepted rendering drift? |
+| `compare` | Did the candidate improve without changing data or semantics? |
+| `package` | Is the approved delivery complete and self-verifying? |
+
+The commands deliberately do not overlap. The render manifest proves that one
+bundle was not edited after rendering. It cannot compare two runs because
+Matplotlib writes a timestamp into SVG metadata. Structural fingerprints ignore
+that metadata and compare text, colours, fonts, element counts, canvas size,
+and quantised geometry instead.
+
+## Run-bundle contents
 
 ```text
 runs/demo/
@@ -100,96 +116,61 @@ runs/demo/
 └── environment.lock
 ```
 
-`paperfig review` adds `figure.review.json` and `figure.review.md` to that directory. Both are excluded from the render-time manifest, so reviewing a bundle never invalidates its own integrity check.
+`paperfig review` adds `figure.review.json` and `figure.review.md`. These are
+excluded from the render-time manifest so review cannot invalidate the bundle
+it is reviewing.
 
-## Three verification stages
+`paperfig compare --output DIR` adds `figure.comparison.json` and
+`figure.comparison.md` in the chosen report directory.
 
-The checking commands answer different questions and deliberately do not overlap:
+`paperfig package` includes the complete run, deterministic review reports, and
+`submission.manifest.json` in a sorted ZIP with fixed entry metadata. It also
+writes `<archive>.sha256` beside the ZIP.
 
-| Stage | Input | Question |
-| --- | --- | --- |
-| `audit` | a FigureSpec | Is this figure allowed to be made this way? |
-| `review` | one run bundle | Is this bundle intact and readable? |
-| `regress` | two renders | Did this figure change since last time? |
-
-### Reviewer mode
-
-`paperfig review <bundle>` re-reads a finished run and reports deterministic findings. It never re-renders, never edits artifacts, and never calls a model.
-
-- **Integrity.** Every manifest entry is re-hashed with SHA-256, missing artifacts are errors, and untracked files are warnings.
-- **Colour vision.** Series colours are simulated for deuteranopia, protanopia, and tritanopia in linear RGB and compared as CIE L\*a\*b\* delta-E76.
-- **Contrast and greyscale.** WCAG 3:1 non-text contrast, near-neutral series colours, and luminance separation for venues that require greyscale legibility.
-- **Venue fit.** Label sizes and figure width measured from the exported SVG against the venue profile.
+## Visual-regression baselines
 
 ```bash
-paperfig review runs/demo                  # exits 2 only on error findings
-paperfig review runs/demo --fail-on warning
+paperfig regress examples/specs/grouped_bar.yaml --update
+paperfig regress examples/specs/grouped_bar.yaml --fail-on warning
 ```
 
-Every rule, threshold, and limitation is documented in [`docs/REVIEWER_MODE.md`](docs/REVIEWER_MODE.md). A passing review is not peer review, and it does not validate the scientific claim behind the figure.
+Baselines are JSON under `tests/baselines/`, not binary images. They must be
+recorded in the same pinned environment that enforces them. CI records all
+seven example baselines and enforces every committed baseline.
 
-### Visual regression
+## Clean-room and attribution notice
 
-`paperfig regress <spec>` renders a spec and compares a **structural fingerprint** of the SVG against a recorded baseline in `tests/baselines/`.
+This is an independent implementation. No source code, images, datasets, or
+documentation text from
+[`ChenLiu-1996/figures4papers`](https://github.com/ChenLiu-1996/figures4papers)
+has been copied. No explicit upstream license was identified at project
+initialization, so that repository remains conceptual prior art only unless
+permission or a compatible license is verified.
 
-File hashing cannot do this job: Matplotlib writes a creation timestamp into SVG metadata, so the same spec never renders to the same bytes twice. Pixel diffing only works inside one exact rendering stack. The fingerprint instead records text, colours, font sizes, element counts, canvas size, and a quantised digest of path geometry.
+All bundled example datasets are synthetic and explicitly labelled as
+non-evidence.
 
-Because baselines are JSON, a rendering change shows up in a pull request as a readable diff rather than an opaque image blob:
+## Documentation
 
-```diff
--    "Accuracy",
-+    "Precision",
-```
+- [`docs/PHASE2_COMPLETE.md`](docs/PHASE2_COMPLETE.md)
+- [`docs/REVIEWER_MODE.md`](docs/REVIEWER_MODE.md)
+- [`docs/VISUAL_REGRESSION.md`](docs/VISUAL_REGRESSION.md)
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
+- [`docs/SCIENTIFIC_SEMANTICS.md`](docs/SCIENTIFIC_SEMANTICS.md)
+- [`docs/VENUE_PROFILES.md`](docs/VENUE_PROFILES.md)
+- [`docs/CLEAN_ROOM.md`](docs/CLEAN_ROOM.md)
+- [`docs/ACADEMIC_INTEGRITY.md`](docs/ACADEMIC_INTEGRITY.md)
+- [`THIRD_PARTY.yml`](THIRD_PARTY.yml)
 
-Text, colour, and font-size changes are errors. Element-count, canvas, and geometry changes are warnings that downgrade to notes when the baseline was recorded under a different Matplotlib version, so a dependency bump cannot fail a build for no substantive reason.
+## Human-only decisions
 
-```bash
-paperfig regress examples/specs/grouped_bar.yaml --update   # record
-paperfig regress examples/specs/grouped_bar.yaml            # check
-```
-
-See [`docs/VISUAL_REGRESSION.md`](docs/VISUAL_REGRESSION.md) for the full rule set and limitations.
-
-## FigureSpec example
-
-```yaml
-claim: "The proposed method improves accuracy across both datasets."
-venue: nature-machine-intelligence
-stage: draft
-backend: matplotlib
-
-data:
-  source: ../datasets/grouped_bar.csv
-  license: CC0-1.0
-  citation: "Synthetic demonstration data created for this repository."
-
-chart:
-  family: comparison
-  mark: bar
-  x: model
-  y: accuracy
-  series: dataset
-  error: std
-  highlight: Ours
-
-qa:
-  require_zero_baseline: true
-  color_vision_gate: true
-  require_alt_text: true
-
-export:
-  formats: [svg, pdf, png]
-  dpi: 300
-```
-
-## Non-goals for the MVP
-
-- copying the visual identity of a specific published figure;
-- redistributing third-party figures or datasets;
-- executing arbitrary generated Python;
-- silently choosing statistical transformations;
-- claiming that automated checks replace author or reviewer judgment.
+Automation does not decide whether a claim is valid, a statistical transform
+is appropriate, an axis truncation is justified, third-party material may be
+redistributed, or a figure should be formally submitted. Those remain explicit
+human responsibilities.
 
 ## License
 
-Original code in this repository is released under the MIT License. Third-party material, links, datasets, and generated research outputs remain subject to their own terms. The license does not retroactively authorize reuse of any upstream repository.
+Original code in this repository is released under the MIT License. Third-party
+material, links, datasets, and generated research outputs remain subject to
+their own terms.

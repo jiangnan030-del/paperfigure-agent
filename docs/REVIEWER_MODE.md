@@ -1,106 +1,105 @@
 # Reviewer Mode
 
-`paperfig review <bundle>` performs a deterministic, rule-based pass over a
-rendered run bundle. It never re-renders, never edits artifacts, and never
-calls a model. It answers two questions:
-
-1. **Is this bundle still the bundle that was rendered?**
-2. **Would a reader with limited colour vision, or a greyscale printer, be able
-   to read this figure?**
+`paperfig review <bundle>` performs a deterministic, read-only review of a
+finished run bundle. It does not re-render, repair, call a model, or validate
+the scientific claim.
 
 ```bash
-paperfig render examples/specs/grouped_bar.yaml --output runs/demo
 paperfig review runs/demo
 paperfig review runs/demo --fail-on warning
 ```
 
-The command writes `figure.review.json` and `figure.review.md` into the bundle.
-Both files are deliberately excluded from the render-time artifact manifest, so
-reviewing a bundle never invalidates its own integrity check.
+It writes `figure.review.json` and `figure.review.md` into the bundle.
 
-## Exit behaviour
+## Exit thresholds
 
-| `--fail-on` | Exits non-zero when |
+| `--fail-on` | Non-zero exit when |
 | --- | --- |
-| `error` (default) | any finding has severity `error` |
-| `warning` | any finding has severity `warning` or `error` |
-| `never` | never; the report is still written |
+| `error` (default) | an error exists |
+| `warning` | a warning or error exists |
+| `never` | never |
 
-CI uses the default, so integrity regressions break the build while
-accessibility observations stay visible without blocking work in progress.
+## Bundle integrity
 
-## Rules
+Reviewer Mode requires the replay spec, snapshotted data, replay script, audit,
+provenance, alt text, environment lock, run log, artifact manifest, and every
+requested export. Every manifest entry is re-hashed with SHA-256.
 
-### Bundle integrity
+Errors include missing required artifacts, missing or empty manifests, missing
+tracked files, and digest mismatches. Malformed entries, size mismatches, and
+untracked files are warnings. Review reports themselves are intentionally
+ignored because they are produced after the render manifest is frozen.
 
-| Rule | Severity | Meaning |
-| --- | --- | --- |
-| `BUNDLE_ARTIFACT_MISSING` | error | A required run artifact or declared export format is absent. |
-| `MANIFEST_MISSING` | error | The bundle has no `artifact.manifest.json`. |
-| `MANIFEST_EMPTY` | error | The manifest records no artifacts. |
-| `MANIFEST_ENTRY_MISSING` | error | A manifest-tracked file is gone. |
-| `MANIFEST_DIGEST_MISMATCH` | error | A file no longer matches its render-time SHA-256. |
-| `MANIFEST_SIZE_MISMATCH` | warning | A file no longer matches its recorded size. |
-| `MANIFEST_SCHEMA_UNKNOWN` | warning | The manifest schema version is unrecognized. |
-| `MANIFEST_ENTRY_MALFORMED` | warning | A manifest entry has no usable path. |
-| `MANIFEST_UNTRACKED_FILE` | warning | The bundle contains a file the manifest does not track. |
+## Categorical colours
 
-### Colour and accessibility
+Categorical palettes are converted from sRGB to CIE L*a*b* against D65.
+Deuteranopia, protanopia, and tritanopia are approximated in linear RGB, and
+each pair is scored by the worst simulated deltaE76.
 
-| Rule | Severity | Threshold |
-| --- | --- | --- |
-| `CVD_COLOR_COLLISION` | error when `qa.color_vision_gate` is true, else warning | worst-case simulated delta-E76 < 5.0 |
-| `CVD_COLOR_MARGINAL` | warning | worst-case simulated delta-E76 < 12.0 |
-| `LOW_CONTRAST_AGAINST_BACKGROUND` | warning | WCAG non-text contrast against white < 3.0:1 |
-| `LOW_CHROMA_SERIES_COLOR` | warning | CIE chroma < 8.0 while more than one series is drawn |
-| `GRAYSCALE_LUMINANCE_COLLISION` | warning | relative luminance gap < 0.10, only for venues that require greyscale legibility |
-| `REDUNDANT_ENCODING_MISSING` | warning | multi-series `line` or `scatter` marks separated by colour alone |
-| `SEQUENTIAL_COLORMAP_NOT_REVIEWED` | info | heatmaps are skipped by the categorical rules |
-| `PALETTE_NOT_REVIEWABLE` | info | the venue profile has no usable palette |
+| Rule | Threshold |
+| --- | --- |
+| `CVD_COLOR_COLLISION` | worst simulated deltaE76 below 5 |
+| `CVD_COLOR_MARGINAL` | worst simulated deltaE76 from 5 to below 12 |
+| `GRAYSCALE_LUMINANCE_COLLISION` | luminance gap below 0.10 when required |
+| `LOW_CONTRAST_AGAINST_BACKGROUND` | WCAG non-text contrast below 3:1 |
+| `LOW_CHROMA_SERIES_COLOR` | CIE chroma below 8 in a multi-colour figure |
 
-### Typography, size, and alt text
+A collision is an error when `qa.color_vision_gate` is enabled. Warnings advise
+shape, marker, dash, pattern, or direct-label redundancy.
 
-| Rule | Severity | Meaning |
-| --- | --- | --- |
-| `FONT_SIZE_BELOW_VENUE_MINIMUM` | warning | SVG label text is smaller than `constraints.label_font_size_pt[0]`. |
-| `FIGURE_WIDTH_EXCEEDS_VENUE` | warning | The exported SVG is wider than `constraints.max_width_mm`. |
-| `ALT_TEXT_MISSING` | error | `qa.require_alt_text` is set but no alt text exists. |
-| `ALT_TEXT_TOO_SHORT` | warning | Alt text is shorter than 80 characters. |
-| `TYPOGRAPHY_NOT_VERIFIABLE` | info | No SVG, or no readable font sizes in it. |
-| `VENUE_FONT_RANGE_UNSPECIFIED` | info | The venue profile states no label size range. |
-| `FIGURE_WIDTH_NOT_VERIFIABLE` | info | The SVG root declares no readable width. |
+## Continuous colormaps
 
-## Colour method
+Heatmaps use `viridis` in the current renderer. The public review path samples
+17 points and checks normal vision plus deuteranopia, protanopia, and
+tritanopia simulation.
 
-All colour math lives in `src/paperfig/review/color.py` and is an independent
-implementation of published methods:
+| Rule | Trigger |
+| --- | --- |
+| `COLORMAP_NOT_REVIEWABLE` | map cannot be sampled |
+| `COLORMAP_LIGHTNESS_REVERSAL` | signed lightness step below -0.5 L* |
+| `COLORMAP_CVD_LIGHTNESS_REVERSAL` | the same after CVD simulation |
+| `COLORMAP_NONUNIFORM_STEPS` | adjacent deltaE76 coefficient of variation above 0.30 |
+| `COLORMAP_CVD_FLAT_SPOT` | simulated adjacent deltaE76 below 1.5 |
+| `COLORMAP_ENDPOINT_COLLISION` | worst endpoint deltaE76 below 20 |
 
-- sRGB transfer function and primaries: IEC 61966-2-1.
-- CIE L\*a\*b\* conversion against the D65 white point: CIE 15:2004.
-- Dichromat simulation matrices applied in **linear** RGB: Vienot, Brettel and
-  Mollon (1999), *Digital video colourmaps for checking the legibility of
-  displays by dichromats*, Color Research & Application 24(4), 243-252.
-- Relative luminance and contrast ratio: WCAG 2.1, sections 1.4.3 and 1.4.11.
+Lightness reversal and endpoint collision are errors when the CVD gate is
+enabled. The old `SEQUENTIAL_COLORMAP_NOT_REVIEWED` placeholder is removed.
 
-The reviewed colour set is derived from the venue profile palette and the
-number of distinct series in the bundled data, plus the highlight colour when
-the FigureSpec sets `chart.highlight`. Deriving colours from the spec rather
-than scraping the SVG keeps the result stable across Matplotlib versions.
+## Typography, dimensions, alt text, and encoding
 
-Separation is reported as delta-E76 under the worst of deuteranopia,
-protanopia, and tritanopia. A delta-E76 near 5 is roughly the point where two
-colours stop being reliably distinguishable at small sizes; 12 is the point
-where separation stops being comfortable in print.
+- SVG text remains text (`svg.fonttype="none"`) so declared font sizes can be
+  checked against a verified venue range.
+- Figure width is checked only when the venue profile records `max_width_mm`.
+- Required alt text must exist; text shorter than 80 characters is a warning.
+- Multi-series line and scatter figures warn when colour is the only series
+  encoding.
+
+A missing verified venue constraint degrades to an info finding rather than an
+invented rule.
+
+## Reports
+
+The JSON report contains schema version, status, tool version, counts, findings,
+limitations, and `human_review_required: true`. Every finding contains a stable
+rule ID, severity, message, evidence, and remediation.
+
+The Markdown report presents the same information for human review. Reports
+are advisory evidence and never count as approval for `paperfig package`.
+
+## Method references
+
+- IEC 61966-2-1: sRGB transfer function and primaries.
+- CIE 15:2004: CIE L*a*b* and D65.
+- Vienot, Brettel, and Mollon (1999): linear-RGB dichromat approximations.
+- WCAG 2.1 sections 1.4.3 and 1.4.11: contrast ratios.
+
+The simulation is an approximation. It does not model anomalous trichromacy,
+individual adaptation, display calibration, print production, or viewing
+conditions.
 
 ## Limitations
 
-- The simulation models dichromacy only. Anomalous trichromacy, individual
-  adaptation, and display calibration are out of scope.
-- Continuous colormaps are not evaluated. Heatmaps receive an informational
-  finding instead.
-- Only SVG is measured for typography and width. PDF and PNG are checked for
-  presence and integrity only.
-- Contrast is measured against a white background because the renderer does not
-  emit figure backgrounds.
-- Panel composition, statistical validity, and caption quality are not
-  reviewed. Reviewer Mode supports human review; it does not replace it.
+- deterministic rules are not peer review;
+- panel composition and statistical interpretation remain outside Reviewer Mode;
+- passing checks does not validate the claim, data provenance, or rights status;
+- final scientific and publication decisions require a human.

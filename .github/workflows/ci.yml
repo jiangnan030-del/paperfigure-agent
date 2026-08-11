@@ -23,7 +23,7 @@ jobs:
         run: ruff check .
       - name: Test
         run: pytest
-      - name: Smoke render, audit, replay, and review all supported marks
+      - name: Smoke complete deterministic workflow
         shell: bash
         run: |
           set -euo pipefail
@@ -37,6 +37,10 @@ jobs:
               python figure.py
             )
             paperfig review "${output}"
+            paperfig compare "${output}" "${output}" \
+              --output "runs/ci/comparisons/${name}" --fail-on warning
+            paperfig package "${output}" \
+              --output "runs/ci/packages/${name}.submission.zip" --approve
           done
       - name: Record and enforce visual regression baselines
         shell: bash
@@ -45,9 +49,8 @@ jobs:
           for spec in examples/specs/*.yaml; do
             name="$(basename "${spec}" .yaml)"
             paperfig regress "${spec}" --update --baselines runs/ci/baselines
-            if [ -f "tests/baselines/${name}.baseline.json" ]; then
-              paperfig regress "${spec}" --baselines tests/baselines --fail-on warning
-            fi
+            paperfig regress "${spec}" \
+              --baselines tests/baselines --fail-on warning
           done
       - name: Upload smoke artifacts
         uses: actions/upload-artifact@v4
