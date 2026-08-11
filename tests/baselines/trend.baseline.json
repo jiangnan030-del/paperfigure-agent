@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "spec_name": "trend",
+  "canvas_width_pt": 242.4,
+  "canvas_height_pt": 167.52,
+  "element_counts": {
+    "Agent": 1,
+    "RDF": 1,
+    "Work": 1,
+    "clipPath": 1,
+    "creator": 1,
+    "date": 1,
+    "defs": 20,
+    "format": 1,
+    "g": 103,
+    "metadata": 1,
+    "path": 56,
+    "rect": 1,
+    "style": 1,
+    "svg": 1,
+    "title": 1,
+    "type": 1,
+    "use": 90
+  },
+  "text_content": [],
+  "colors": [
+    "#000000",
+    "#0072b2",
+    "#d55e00",
+    "#d9d9d9",
+    "#ffffff"
+  ],
+  "font_sizes_pt": [],
+  "geometry_digest": "d2f29a0e8a56ed06e2a73fab54fe53112cf0356360e1607accfe9cc078b00f3b",
+  "geometry_points": 1892,
+  "environment": {
+    "matplotlib": "3.11.1",
+    "python": "3.12.13",
+    "platform": "Linux-x86_64"
+  }
+}

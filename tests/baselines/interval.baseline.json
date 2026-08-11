@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "spec_name": "interval",
+  "canvas_width_pt": 354.0,
+  "canvas_height_pt": 243.41,
+  "element_counts": {
+    "Agent": 1,
+    "RDF": 1,
+    "Work": 1,
+    "clipPath": 1,
+    "creator": 1,
+    "date": 1,
+    "defs": 18,
+    "format": 1,
+    "g": 82,
+    "metadata": 1,
+    "path": 48,
+    "rect": 1,
+    "style": 1,
+    "svg": 1,
+    "title": 1,
+    "type": 1,
+    "use": 76
+  },
+  "text_content": [],
+  "colors": [
+    "#000000",
+    "#0072b2",
+    "#d55e00",
+    "#d9d9d9",
+    "#e69f00",
+    "#ffffff"
+  ],
+  "font_sizes_pt": [],
+  "geometry_digest": "b2f041ac1f38f9770cc01cee2439772f0ffef9cd1c912396e09103929b6cf5d8",
+  "geometry_points": 1774,
+  "environment": {
+    "matplotlib": "3.11.1",
+    "python": "3.12.13",
+    "platform": "Linux-x86_64"
+  }
+}
